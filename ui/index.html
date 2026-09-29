@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; img-src 'self' data:; font-src 'self' data:; style-src 'self'; style-src-attr 'unsafe-inline'; object-src 'none'; base-uri 'none'; form-action 'none'"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="color-scheme" content="dark" />
+        <title>caveATS</title>
+        <link rel="stylesheet" href="./style.css" />
+    </head>
+    <body data-state="intake">
+        <header class="masthead">
+            <p class="wordmark">caveATS</p>
+            <div class="masthead-actions">
+                <div class="lang-switch" role="group" aria-label="Language">
+                    <button type="button" data-set-lang="en" lang="en" aria-label="English">EN</button>
+                    <button type="button" data-set-lang="fr" lang="fr" aria-label="Français">FR</button>
+                </div>
+                <button type="button" class="again" data-i18n="again" hidden></button>
+            </div>
+        </header>
+        <main>
+            <section class="intake">
+                <div class="intake-head">
+                    <h1 data-i18n="headline"></h1>
+                    <p class="lede" data-i18n="lede"></p>
+                </div>
+                <label class="dropzone">
+                    <input type="file" accept="application/pdf,.pdf" class="visually-hidden" />
+                    <span class="dropzone-action" data-i18n="chooseFile"></span>
+                    <span class="dropzone-hint" data-i18n="dropHint"></span>
+                    <span class="dropzone-limit" data-i18n="limitHint"></span>
+                </label>
+                <div class="intake-foot">
+                    <p class="status" role="status"></p>
+                    <p class="alert" role="alert"></p>
+                    <p class="privacy" data-i18n="privacy"></p>
+                </div>
+            </section>
+            <div class="result-slot"></div>
+        </main>
+        <script type="module" src="./main.ts"></script>
+    </body>
+</html>

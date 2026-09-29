@@ -1,0 +1,724 @@
+@import '@fontsource-variable/atkinson-hyperlegible-next';
+@import '@fontsource-variable/atkinson-hyperlegible-mono';
+
+/* A document examiner's light box: the room is dark indigo, ultraviolet light
+   makes hidden ink fluoresce cyan. */
+:root {
+    --room: #1d1640;
+    --room-raised: #271e52;
+    --ink: #efeaff;
+    --ink-muted: #a79fd0;
+    --fluorescence: #8ff5ff;
+    --amber: #ffc46b;
+    --uv-tint: rgb(74 38 190 / 0.62);
+
+    --font-text: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+    --font-machine: 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace;
+
+    --step--1: 0.875rem;
+    --step-0: 1.0625rem;
+    --step-1: 1.3125rem;
+    --step-2: clamp(1.625rem, 1.3rem + 1.4vw, 2rem);
+    --step-3: clamp(2rem, 1.4rem + 3.4vw, 3.75rem);
+
+    --sweep: 1400ms cubic-bezier(0.45, 0, 0.2, 1);
+    --gutter: clamp(1rem, 4vw, 3rem);
+    --edge-left: max(var(--gutter), env(safe-area-inset-left));
+    --edge-right: max(var(--gutter), env(safe-area-inset-right));
+    --touch: 2.75rem;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--room);
+    color: var(--ink);
+    font-family: var(--font-text);
+    font-size: var(--step-0);
+    line-height: 1.55;
+    font-weight: 400;
+}
+
+:focus-visible {
+    outline: 2px solid var(--fluorescence);
+    outline-offset: 3px;
+}
+
+.verdict:focus {
+    outline: none;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+button {
+    font: inherit;
+    color: var(--room);
+    background: var(--ink);
+    border: 0;
+    border-radius: 999px;
+    padding: 0 1.1rem;
+    min-height: var(--touch);
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--fluorescence);
+}
+
+/* ---- Masthead ---- */
+
+.masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: max(0.5rem, env(safe-area-inset-top)) var(--edge-right) 0.5rem var(--edge-left);
+}
+
+.wordmark {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
+.wordmark::before {
+    content: '';
+    display: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--fluorescence);
+    box-shadow: 0 0 10px 2px rgb(143 245 255 / 0.6);
+}
+
+.masthead-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.lang-switch {
+    display: flex;
+}
+
+.lang-switch button {
+    min-width: var(--touch);
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+    font-weight: 700;
+}
+
+.lang-switch button:hover {
+    background: transparent;
+    color: var(--ink);
+}
+
+.lang-switch button[aria-pressed='true'] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--fluorescence);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+}
+
+.again {
+    padding: 0 0.75rem;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid rgb(239 234 255 / 0.35);
+    font-size: var(--step--1);
+}
+
+.again:hover {
+    background: transparent;
+    border-color: var(--fluorescence);
+    color: var(--fluorescence);
+}
+
+main {
+    padding: 1rem var(--edge-right) calc(3rem + env(safe-area-inset-bottom)) var(--edge-left);
+}
+
+/* The live regions live in the intake, so it stays rendered once a result shows. */
+body:not([data-state='intake']) .intake {
+    display: block;
+}
+
+body:not([data-state='intake']) .intake-head,
+body:not([data-state='intake']) .dropzone,
+body:not([data-state='intake']) .privacy {
+    display: none;
+}
+
+body:not([data-state='intake']) .intake-foot {
+    padding-top: 0;
+}
+
+/* ---- Intake: headline, drop target, then the fine print ---- */
+
+.intake {
+    display: grid;
+    grid-template-areas:
+        'head'
+        'drop'
+        'foot';
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 1.5rem;
+    align-items: start;
+}
+
+.intake-head {
+    grid-area: head;
+}
+
+.intake-foot {
+    grid-area: foot;
+}
+
+/* The drop target is an empty sheet waiting on the light box. */
+.dropzone {
+    grid-area: drop;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 11rem;
+    padding: 1.5rem;
+    text-align: center;
+    background: var(--room-raised);
+    border: 1px solid rgb(143 245 255 / 0.28);
+    box-shadow:
+        0 0 0 1px var(--room),
+        0 0 48px rgb(143 245 255 / 0.08);
+    cursor: pointer;
+    transition:
+        box-shadow 200ms ease,
+        border-color 200ms ease;
+}
+
+.dropzone:hover,
+.dropzone:has(input:focus-visible),
+body[data-dragging] .dropzone {
+    border-color: var(--fluorescence);
+    box-shadow:
+        0 0 0 1px var(--room),
+        0 0 64px rgb(143 245 255 / 0.25);
+}
+
+.dropzone:has(input:focus-visible) {
+    outline: 2px solid var(--fluorescence);
+    outline-offset: 4px;
+}
+
+.dropzone-action {
+    font-size: var(--step-1);
+    font-weight: 700;
+}
+
+.dropzone-hint,
+.dropzone-limit {
+    color: var(--ink-muted);
+}
+
+.dropzone-limit {
+    font-size: var(--step--1);
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .dropzone-hint {
+        display: none;
+    }
+}
+
+.intake-head h1 {
+    margin: 0 0 1rem;
+    font-size: var(--step-3);
+    line-height: 1.08;
+    font-weight: 300;
+    letter-spacing: -0.025em;
+    max-width: 16ch;
+    text-wrap: balance;
+}
+
+.lede {
+    margin: 0;
+    max-width: 34ch;
+    color: var(--ink);
+}
+
+.status {
+    margin: 0 0 0.5rem;
+    min-height: 1.55em;
+    color: var(--fluorescence);
+    overflow-wrap: anywhere;
+}
+
+body:not([data-state='intake']) .status:empty {
+    min-height: 0;
+    margin: 0;
+}
+
+.alert {
+    margin: 0 0 0.5rem;
+    color: var(--amber);
+    overflow-wrap: anywhere;
+}
+
+.alert:empty {
+    margin: 0;
+}
+
+.privacy {
+    margin: 0;
+    max-width: 52ch;
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+}
+
+/* ---- Result: verdict first, then the page under the lamp, then details ---- */
+
+.result {
+    display: grid;
+    grid-template-areas:
+        'verdict'
+        'viewer'
+        'details';
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2.25rem;
+    align-items: start;
+}
+
+.result[data-verdict='error'] {
+    grid-template-areas: 'verdict';
+    grid-template-columns: minmax(0, 38rem);
+}
+
+.verdict-block {
+    grid-area: verdict;
+}
+
+.viewer {
+    grid-area: viewer;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.details {
+    grid-area: details;
+}
+
+.view-switch {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0.25rem;
+    border: 0;
+    background: var(--room-raised);
+    border-radius: 999px;
+    width: fit-content;
+}
+
+.view-switch label {
+    display: flex;
+    align-items: center;
+    min-height: var(--touch);
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+    cursor: pointer;
+}
+
+.view-switch label:has(input:checked) {
+    background: var(--ink);
+    color: var(--room);
+}
+
+.view-switch label:has(input:focus-visible) {
+    outline: 2px solid var(--fluorescence);
+    outline-offset: 2px;
+}
+
+.view-switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sheets {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sheet {
+    position: relative;
+    margin: 0;
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    background: #fff;
+    box-shadow:
+        0 0 0 1px var(--room),
+        0 24px 60px rgb(8 4 28 / 0.55);
+}
+
+.sheet img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Everything the lamp reveals sits in one layer, uncovered top to bottom.
+   The clip leaves room around the page so the glow is not cut at its edges. */
+.uv-layer {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(-2rem -2rem calc(100% + 2rem) -2rem);
+    transition: clip-path var(--sweep);
+}
+
+.uv-layer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--uv-tint);
+    mix-blend-mode: multiply;
+}
+
+.sheets[data-view='machine'] .uv-layer {
+    clip-path: inset(-2rem);
+}
+
+.glow {
+    position: absolute;
+    min-height: 14px;
+    min-width: 14px;
+    translate: 0 min(0px, calc(7px - 50%));
+    background: rgb(143 245 255 / 0.45);
+    outline: 2px solid var(--fluorescence);
+    box-shadow:
+        0 0 0 4px var(--room),
+        0 0 14px 6px var(--fluorescence),
+        0 0 44px 12px rgb(143 245 255 / 0.55);
+    border-radius: 2px;
+}
+
+/* The mark is small: this extends its tap area to 44 px in both directions. */
+.glow::after {
+    content: '';
+    position: absolute;
+    inset: -15px;
+}
+
+.glow .number {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    translate: -50% -50%;
+    min-width: 1.4rem;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: var(--fluorescence);
+    color: var(--room);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.4rem;
+    text-align: center;
+}
+
+.lamp {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3px;
+    opacity: 0;
+    background: var(--fluorescence);
+    box-shadow:
+        0 0 18px 4px var(--fluorescence),
+        0 0 60px 10px rgb(143 245 255 / 0.45);
+    pointer-events: none;
+}
+
+/* ---- Verdict and details ---- */
+
+.verdict {
+    margin: 0 0 0.75rem;
+    font-size: var(--step-2);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+}
+
+.result[data-verdict='human-review'] .verdict {
+    color: var(--amber);
+}
+
+.verdict-note {
+    margin: 0 0 0.5rem;
+    color: var(--ink-muted);
+    max-width: 52ch;
+}
+
+.passages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: passage;
+}
+
+.passages li {
+    counter-increment: passage;
+    position: relative;
+    padding: 0 0 1.5rem 2.5rem;
+    scroll-margin-top: 2rem;
+}
+
+.passages li::before {
+    content: counter(passage);
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    min-width: 1.6rem;
+    border-radius: 999px;
+    background: var(--fluorescence);
+    color: var(--room);
+    font-size: var(--step--1);
+    font-weight: 700;
+    line-height: 1.6rem;
+    text-align: center;
+}
+
+.passages li:target .machine-text {
+    border-color: var(--fluorescence);
+}
+
+.where::first-letter {
+    text-transform: uppercase;
+}
+
+.where {
+    margin: 0 0 0.5rem;
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+}
+
+.machine-text {
+    margin: 0;
+    padding: 0.75rem;
+    font-family: var(--font-machine);
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--fluorescence);
+    background: rgb(143 245 255 / 0.06);
+    border-left: 2px solid rgb(143 245 255 / 0.35);
+    overflow-wrap: anywhere;
+}
+
+.intent-title {
+    margin: 2rem 0 0.25rem;
+    font-size: var(--step-1);
+    font-weight: 700;
+}
+
+.intent-note {
+    margin: 0 0 1.25rem;
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+    max-width: 52ch;
+}
+
+.intent {
+    margin: 0;
+}
+
+.intent-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    padding: 0.6rem 0;
+}
+
+.intent dt {
+    line-height: 1.35;
+}
+
+.intent dd {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+}
+
+.bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--room-raised);
+    overflow: hidden;
+}
+
+.bar span {
+    display: block;
+    height: 100%;
+    background: var(--ink);
+}
+
+.value {
+    min-width: 2.75rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+code {
+    font-family: var(--font-machine);
+    font-size: 0.9em;
+}
+
+/* ---- Wider than a phone ---- */
+
+@media (min-width: 23rem) {
+    .wordmark::before {
+        display: block;
+    }
+}
+
+@media (min-width: 40rem) {
+    .masthead {
+        padding-block: max(0.75rem, env(safe-area-inset-top)) 0.75rem;
+    }
+
+    .masthead-actions {
+        gap: 1rem;
+    }
+
+    main {
+        padding-top: 1.5rem;
+    }
+
+    .intake-head h1 {
+        margin-bottom: 1.5rem;
+    }
+
+    .lede {
+        font-size: var(--step-1);
+        line-height: 1.45;
+    }
+
+    .machine-text {
+        padding: 0.75rem 1rem;
+    }
+
+    .intent-row {
+        grid-template-columns: minmax(0, 1fr) 9rem;
+        align-items: center;
+        gap: 1rem;
+    }
+}
+
+/* Page on the left, words on the right, before and after the check. */
+@media (min-width: 56rem) {
+    .intake,
+    .result {
+        grid-template-columns: minmax(0, 34rem) minmax(0, 38rem);
+        column-gap: clamp(2rem, 5vw, 5rem);
+    }
+
+    .intake {
+        grid-template-areas:
+            'drop head'
+            'drop foot';
+        grid-template-rows: auto 1fr;
+        row-gap: 0;
+    }
+
+    .dropzone {
+        aspect-ratio: 210 / 297;
+        min-height: 0;
+    }
+
+    .intake-foot {
+        padding-top: 2.5rem;
+    }
+
+    .result {
+        grid-template-areas:
+            'viewer verdict'
+            'viewer details';
+        grid-template-rows: auto 1fr;
+        row-gap: 2rem;
+    }
+
+    .result[data-verdict='error'] {
+        grid-template-areas: 'verdict';
+        grid-template-columns: minmax(0, 38rem);
+    }
+
+    .result[data-verdict='clean'] .verdict-block {
+        grid-row: 1 / -1;
+        align-self: center;
+    }
+
+    /* A one-page CV fits the screen height, so the whole page is in view,
+       but never narrower than 30rem: below that its text cannot be read. */
+    .sheet {
+        width: min(100%, max(30rem, calc((100svh - 11rem) * var(--ratio))));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .uv-layer {
+        transition: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .uv-layer::before {
+        display: none;
+    }
+
+    .view-switch label:has(input:checked) {
+        forced-color-adjust: none;
+        background: Highlight;
+        color: HighlightText;
+    }
+
+    .bar {
+        outline: 1px solid CanvasText;
+    }
+
+    .bar span {
+        forced-color-adjust: none;
+        background: CanvasText;
+    }
+}

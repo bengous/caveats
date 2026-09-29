@@ -1,0 +1,43 @@
+{
+    "name": "caveats",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Find text hidden from human readers in a CV, judge its intent with Jev, and hand the case to a human.",
+    "license": "MIT",
+    "bin": {
+        "caveats": "src/cli.ts"
+    },
+    "type": "module",
+    "module": "src/index.ts",
+    "scripts": {
+        "dev": "bun --hot src/cli.ts serve --dev",
+        "check": "bun run typecheck && bun run lint && bun run format:check && bun test && bun run check:a11y",
+        "check:a11y": "bun test ./test/a11y/axe.a11y.ts ./test/a11y/behaviour.a11y.ts",
+        "typecheck": "tsc",
+        "lint": "oxlint --type-aware --deny-warnings",
+        "format": "oxfmt",
+        "format:check": "oxfmt --check",
+        "fixtures": "bun test/fixtures/build.ts",
+        "schema": "bun schema/build.ts && oxfmt schema",
+        "build": "bun build --compile src/cli.ts --outfile dist/caveats"
+    },
+    "dependencies": {
+        "@embedpdf/pdfium": "2.15.1",
+        "@fontsource-variable/atkinson-hyperlegible-mono": "5.3.0",
+        "@fontsource-variable/atkinson-hyperlegible-next": "5.3.0",
+        "@typesafe-ai/sdk": "0.6.0",
+        "zod": "4.6.5"
+    },
+    "devDependencies": {
+        "@axe-core/playwright": "4.13.0",
+        "@oxlint/plugins": "1.86.0",
+        "@types/bun": "1.4.2",
+        "@types/emscripten": "1.41.6",
+        "html-validate": "11.16.1",
+        "oxfmt": "0.71.0",
+        "oxlint": "1.86.0",
+        "oxlint-tsgolint": "7.0.2003",
+        "playwright-core": "1.63.0",
+        "typescript": "6.0.3"
+    }
+}

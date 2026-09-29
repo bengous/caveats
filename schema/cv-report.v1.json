@@ -1,0 +1,131 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "oneOf": [
+        {
+            "type": "object",
+            "properties": { "verdict": { "type": "string", "const": "clean" } },
+            "required": ["verdict"]
+        },
+        {
+            "type": "object",
+            "properties": {
+                "verdict": { "type": "string", "const": "human-review" },
+                "hiddenSpans": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "page": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991,
+                                "description": "1-based page number."
+                            },
+                            "text": {
+                                "type": "string",
+                                "description": "The hidden text as the candidate wrote it. Escape it before putting it in HTML."
+                            },
+                            "reasons": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": ["invisible-render-mode", "tiny-font", "off-page", "no-contrast"]
+                                }
+                            },
+                            "boxes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "left": { "type": "number" },
+                                        "right": { "type": "number" },
+                                        "bottom": { "type": "number" },
+                                        "top": { "type": "number" }
+                                    },
+                                    "required": ["left", "right", "bottom", "top"],
+                                    "description": "Rectangle in PDF points, origin at the bottom left of the page."
+                                },
+                                "description": "One rectangle per line of the span."
+                            }
+                        },
+                        "required": ["page", "text", "reasons", "boxes"]
+                    }
+                },
+                "intent": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "status": { "type": "string", "const": "judged" },
+                                "model": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "The Jev model TypeSafe reports for the request."
+                                },
+                                "probabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "instructsAi": {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "maximum": 1,
+                                            "description": "Does `hidden_text` address an AI or automated screening system and tell it what to do or conclude about the candidate?"
+                                        },
+                                        "keywordStuffing": {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "maximum": 1,
+                                            "description": "Is `hidden_text` a list of skills, keywords or qualifications placed there to be matched by a screening system?"
+                                        },
+                                        "claimsAbsentFromVisible": {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "maximum": 1,
+                                            "description": "Does `hidden_text` claim skills, experience or qualifications that `visible_resume_text` does not mention?"
+                                        },
+                                        "selfAwareWink": {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "maximum": 1,
+                                            "description": "Does `hidden_text` read as an openly playful or self-aware joke aimed at AI readers, rather than a serious attempt to deceive?"
+                                        },
+                                        "templateArtifact": {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "maximum": 1,
+                                            "description": "Is `hidden_text` leftover template, layout or placeholder content with no persuasive purpose?"
+                                        }
+                                    },
+                                    "required": [
+                                        "instructsAi",
+                                        "keywordStuffing",
+                                        "claimsAbsentFromVisible",
+                                        "selfAwareWink",
+                                        "templateArtifact"
+                                    ],
+                                    "description": "Probability of yes for each question Jev answers about the hidden text."
+                                }
+                            },
+                            "required": ["status", "model", "probabilities"]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "status": { "type": "string", "const": "not-judged" },
+                                "reason": {
+                                    "type": "string",
+                                    "enum": ["disabled", "judge-failed"],
+                                    "description": "`disabled`: the server runs without TYPESAFE_API_KEY. `judge-failed`: the call to Jev failed (outage, timeout, or an answer outside its schema)."
+                                }
+                            },
+                            "required": ["status", "reason"]
+                        }
+                    ]
+                }
+            },
+            "required": ["verdict", "hiddenSpans", "intent"]
+        }
+    ]
+}

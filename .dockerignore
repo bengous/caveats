@@ -1,0 +1,7 @@
+# Allowlist: the build context holds only what the image runs. `.env` (live
+# API key) and `spike/` (a real person's CV) must never enter it.
+*
+!package.json
+!bun.lock
+!src/
+!ui/

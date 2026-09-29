@@ -1,0 +1,27 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+        "error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "enum": [
+                        "empty-body",
+                        "unauthorized",
+                        "forbidden-host",
+                        "unsupported-media-type",
+                        "unreadable-pdf",
+                        "too-many-pages",
+                        "page-too-large",
+                        "internal"
+                    ]
+                },
+                "message": { "type": "string", "description": "For a person; branch on `code`." }
+            },
+            "required": ["code", "message"]
+        }
+    },
+    "required": ["error"]
+}

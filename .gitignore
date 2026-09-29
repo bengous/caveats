@@ -1,0 +1,6 @@
+.env
+.claude/settings.local.json
+spike/
+node_modules/
+dist/
+TODO.md
